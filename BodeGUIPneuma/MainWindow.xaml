@@ -1,0 +1,292 @@
+﻿<Window x:Class="BodeGUIPneuma.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BodeGUIPneuma"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="800" Width="1000" Closing="ChildWindow_Closing" Background="#4B4646">
+    <Border Visibility="Visible" BorderThickness="2" CornerRadius="8" Margin="10,10,10,10">
+        <Grid Margin="0" Height="Auto">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40" Name="TitleRow"/>
+                <RowDefinition Height="*" Name="InterfaceRow"/>
+            </Grid.RowDefinitions>
+            <Label Content="B o d e   H o r n   C h a r a c t e r i s t i c s" Foreground="LightGray" FontWeight="Bold" FontSize="28" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" FontFamily="Century Gothic">
+                <Label.Effect>
+                    <DropShadowEffect/>
+                </Label.Effect>
+            </Label>
+            <TabControl Grid.Row="1" Background="#4B4646" SelectedIndex="0">
+                <TabItem Header="Horn Characteristics" Background="LightGray" Height="22" VerticalAlignment="Top" >
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150" Name="InterfaceColumn"/>
+                            <ColumnDefinition Width="*" Name="DataColumn"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="1" Margin="10">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="99"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="25"/>
+                                <ColumnDefinition x:Name="ListViewDataColumn" Width="*" MinWidth="300"/>
+                                <ColumnDefinition Width="22.5"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.ColumnSpan="3">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="1.25*"/>
+                                </Grid.RowDefinitions>
+                                <ListView Grid.Row="0" Margin="5" Name="HornData" HorizontalContentAlignment="Center" FontSize="10" Foreground="#FF0B0B0C" MinHeight="206" SizeChanged="HornData_SizeChanged">
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridViewColumn x:Name="IndexColumn" Header="#" Width="10" DisplayMemberBinding="{Binding Index}"/>
+                                            <GridViewColumn x:Name="NameColumn" Header="Horn" Width="60" DisplayMemberBinding="{Binding Name}"/>
+                                            <GridViewColumn x:Name="CapColumn" Header="Capacitance (pF)" Width="100"   DisplayMemberBinding="{Binding Capacitance, StringFormat={}{0:F3}}"/>
+                                            <GridViewColumn x:Name="ResColumn" Header="Res Frequency (kHz)" Width="100" DisplayMemberBinding="{Binding Resfreq, StringFormat={}{0:F3}}"/>
+                                            <GridViewColumn x:Name="AntiColumn" Header="Anti Frequency (kHz)" Width="100"  DisplayMemberBinding="{Binding Antifreq, StringFormat={}{0:F3}}"/>
+                                            <GridViewColumn x:Name="ImpColumn" Header="Impedance" Width="100"  DisplayMemberBinding="{Binding Res_impedance, StringFormat={}{0:F3}}"/>
+                                            <GridViewColumn x:Name="AntiImpColumn" Header="Anti-Impedance (kΩ)" Width="100" DisplayMemberBinding="{Binding Anti_impedance, StringFormat={}{0:F3}}"/>
+                                            <GridViewColumn x:Name="QFColumn" Header="QF" Width="0" DisplayMemberBinding="{Binding QualityFactor, StringFormat={}{0:F3}}"/>
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                                <ContentControl Name="BodePlotContent" Grid.Row="1" Margin="5">
+                                    <ContentControl.Resources>
+                                        <DataTemplate DataType="{x:Type local:BodePlotViewModel}">
+                                            <local:BodePlotView/>
+                                        </DataTemplate>
+                                    </ContentControl.Resources>
+                                </ContentControl>
+                            </Grid>
+
+                            <Grid Grid.Row="1" Grid.ColumnSpan="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="100"/>
+                                </Grid.ColumnDefinitions>
+                                <Button Name="TaskButton" Content="Task Log" Width="100" Margin="0,4,0,4" Click="Task_Click" HorizontalAlignment="Left"/>
+                                <Button Name="ExportButton" Content="Export to CSV" Grid.Column="6" HorizontalAlignment="Right" Width="100" Margin="0,4" Click="Export_Click"/>
+                                <Button Name="DeleteButton" Content="Delete Entry" Grid.Column="2" Margin="0,4" Click="DeleteButton_Click"/>
+                                <Button Name="ClearButton" Content="Clear List" Click="ClearButton_Click" Grid.Column="4" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                            </Grid>
+                            <Grid Grid.Row="2" Grid.Column="1" Margin="0,0,0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="250"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Name="TaskBlock" Grid.Column="0" Background="WhiteSmoke" Margin="-23,5,5,5" TextWrapping="Wrap" Height="Auto"/>
+                                <Grid Grid.Column="1">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="127"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="30"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Name="LowFreqTextBlock" Text="Low Sweep Frequency" FontWeight="DemiBold" Foreground="LightGray" VerticalAlignment="Center" Height="15"/>
+                                    <TextBlock Name="HighFreqTextBlock" Text="High Sweep Frequency" FontWeight="DemiBold" Foreground="LightGray" Grid.Row="1" VerticalAlignment="Center" Height="15"/>
+                                    <TextBlock Name="BandwidthTextBlock" Text="Reciever Bandwidth" FontWeight="DemiBold" Foreground="LightGray" Grid.Row="2" VerticalAlignment="Center" Height="15"/>
+                                    <TextBox Name="LowFreqTextBox" Grid.Column="1" Grid.Row="0" Margin="4,4,0,4" LostFocus="LowFreqTextBox_LostFocus_1" KeyUp="LowFreqTextBox_KeyUp"/>
+                                    <TextBox Name="HighFreqTextBox" Grid.Column="1" Grid.Row="1" Margin="4,4,0,4" LostFocus="HighFreqTextBox_LostFocus_1" KeyUp="HighFreqTextBox_KeyUp"/>
+                                    <ComboBox Name="BandwidthComboBox" Grid.Column="1" Grid.Row="2" Margin="4,4,0,4" FontSize="10">
+                                        <ComboBoxItem Content="1"/>
+                                        <ComboBoxItem Content="3"/>
+                                        <ComboBoxItem Content="10"/>
+                                        <ComboBoxItem Content="30"/>
+                                        <ComboBoxItem Content="100"/>
+                                        <ComboBoxItem Content="300"/>
+                                        <ComboBoxItem Content="1000"/>
+                                        <ComboBoxItem Content="3000"/>
+                                    </ComboBox>
+                                    <!--<TextBox Name="BandwidthTextBox" Grid.Column="1" Grid.Row="2" Margin="4,4,0,4" FontSize="10" LostFocus="BandwidthTextBox_LostFocus"/>-->
+                                    <TextBox Name="LowFreqUnitsBox" Grid.Column="2" Grid.Row="0" Margin="0,4" Text="Hz"/>
+                                    <TextBox Name="HighFreqUnitsBox" Grid.Column="2" Grid.Row="1" Margin="0,4" Text="Hz"/>
+                                    <TextBlock Name="BandwidthUnitsBox" Grid.Column="2" Grid.Row="2" Margin="0,4" Text=" Hz" Background="White"/>
+                                    <TextBlock Name="QFTextBlock" Text="Include Quality Factor" FontWeight="DemiBold" Foreground="LightGray" Grid.Row="3" VerticalAlignment="Center" Height="15"/>
+                                    <CheckBox Name="QFCheckBox" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="4" Unchecked="QFCheckBox_Unchecked" Checked="QFCheckBox_Unchecked"/>
+
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                        <Grid Grid.Column="0">
+                            <Grid.Style>
+                                <Style/>
+                            </Grid.Style>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="175"/>
+                                <RowDefinition Height="75"/>
+                                <RowDefinition Height="20"/>
+                            </Grid.RowDefinitions>
+                            <Button Name="runButton"  Content="Run" HorizontalAlignment="Stretch" Grid.Column="0" Grid.Row="4" VerticalAlignment="Stretch" Margin="4,4" Click="Button_Click_Run" />
+                            <ProgressBar Name="connectProgress" Grid.Row="5" Margin="4,4" Visibility="Collapsed" IsIndeterminate="True" Background="#FFE6E6E6" VerticalAlignment="Stretch" Foreground="#FF06B025" >
+                                <ProgressBar.Effect>
+                                    <DropShadowEffect/>
+                                </ProgressBar.Effect>
+                            </ProgressBar>
+                            <TextBlock Name="ConnectText" Grid.Column="0" Grid.Row="0" TextAlignment="Center" VerticalAlignment="Bottom" Text="Calibration" FontWeight="Bold" Foreground="LightGray"/>
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1.5*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Button Name="connectButton"  Content="Connect" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Center" Click="Button_Click_Connect"/>
+                                <TextBlock Name="connectBox" Grid.Column="1" Background="Red" TextAlignment="Center" VerticalAlignment="Center" Text="Connected"/>
+                            </Grid>
+                            <TextBlock Name="CalibrationText" Grid.Column="0" Grid.Row="2" TextAlignment="Center" VerticalAlignment="Bottom" Text="Calibration" Grid.ColumnSpan="2" FontWeight="Bold" Foreground="LightGray"/>
+                            <Grid Grid.Row="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1.5*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid Grid.Column="0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="35"/>
+                                        <RowDefinition Height="35"/>
+                                        <RowDefinition Height="35"/>
+                                        <RowDefinition Height="35"/>
+                                        <RowDefinition Height="35"/>
+                                    </Grid.RowDefinitions>
+                                    <Button Name="openButton" Content="Open" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Center" Click="Button_Click_Open" Margin="0,2"/>
+                                    <Button Name="shortButton" Content="Short" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Click="Button_Click_Short" Margin="0,2"/>
+                                    <Button Name="loadButton" Content="Load" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Click="Button_Click_Load" Margin="0,2"/>
+                                    <Button Name="testButton" Content="Test" Grid.Row="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Click="click_testButton" Margin="0,2"/>
+                                    <TextBlock Name="HornNameBlock" Grid.Row="4" Text="Horn Name:" VerticalAlignment="Center" FontWeight="DemiBold" Foreground="LightGray"/>
+                                </Grid>
+                                <Grid Grid.Column="1">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="35"/>
+                                        <RowDefinition Height="35"/>
+                                        <RowDefinition Height="35"/>
+                                        <RowDefinition Height="35"/>
+                                        <RowDefinition Height="35"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Name="openBox" Grid.Row="0" Background="Red" TextAlignment="Center" VerticalAlignment="Center" Text="Ready" Margin="0,2"/>
+                                    <TextBlock Name="shortBox" Grid.Row="1" Background="Red" TextAlignment="Center" VerticalAlignment="Center" Text="Ready" Margin="0,2"/>
+                                    <TextBlock Name="loadBox" Grid.Row="2" Background="Red" TextAlignment="Center" VerticalAlignment="Center" Text="Ready" Margin="0,2"/>
+                                    <TextBlock Name="testBox" Grid.Row="3" Background="White" TextAlignment="Right" VerticalAlignment="Center" Text="Ω"/>
+                                    <TextBox Name="HornNameBox" Grid.Row="4" Background="White" TextAlignment="Right" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Track Peaks" Background="LightGray" Height="22" VerticalAlignment="Top" IsEnabled="False" Visibility="Collapsed">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="10"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="2">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="200"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height=".25*"/>
+                            </Grid.RowDefinitions>
+                            <ListView Name="PeakDataList" HorizontalContentAlignment="Center" FontSize="10" Foreground="#FF0B0B0C" Height="206" Margin="4">
+                                <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn x:Name="PeakIndexColumn" Header="#" Width="10" DisplayMemberBinding="{Binding peakNumber}"/>
+                                        <GridViewColumn x:Name="PeakResColumn" Header="Res Frequency" Width="100" DisplayMemberBinding="{Binding ResFreq}"/>
+                                        <GridViewColumn x:Name="PeakAntiColumn" Header="Anti Frequency" Width="100"  DisplayMemberBinding="{Binding AntiFreq}"/>
+                                        <GridViewColumn x:Name="PeakImpColumn" Header="Impedance" Width="100"  DisplayMemberBinding="{Binding ResImp}"/>
+                                        <GridViewColumn x:Name="PeakAntiImpColumn" Header="Anti-Impedance" Width="100" DisplayMemberBinding="{Binding AntiImp}"/>
+                                        <GridViewColumn x:Name="PeakResQFColumn" Header="QF Res" Width="100" DisplayMemberBinding="{Binding ResQ}"/>
+                                        <GridViewColumn x:Name="PeakAntiQFColumn" Header="QF AntiRes" Width="100" DisplayMemberBinding="{Binding AntiQ}"/>
+                                        <GridViewColumn x:Name="PeakCapacitanceColumn" Header="Capacitance" Width="100" DisplayMemberBinding="{Binding Capacitance}"/>
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
+                            <ContentControl Name="PeakPlotContent" Grid.Row="1" Margin="4">
+                                <ContentControl.Resources>
+                                    <DataTemplate DataType="{x:Type local:BodePlotViewModel}">
+                                        <local:PeakPlotView/>
+                                    </DataTemplate>
+                                </ContentControl.Resources>
+                            </ContentControl>
+                            <Grid Grid.Row="2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Button Name="PeakDeleteButton" Content="Delete" Grid.Column="0" Click="DeleteButton_Click"/>
+                                <Button Name="PeakClearButton" Content="Clear" Grid.Column="2" Click="ClearButton_Click"/>
+                                <Button Name="PeakExportButton" Content="Export" Grid.Column="4" Height="30" Click="Export_Click"/>
+                            </Grid>
+                        </Grid>
+                        <Grid Grid.Column="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="10"/>
+                                <RowDefinition Height="50"/>
+                                <RowDefinition Height="10"/>
+                                <RowDefinition Height="50"/>
+                                <RowDefinition Height="10"/>
+                                <RowDefinition Height="150"/>
+                                <RowDefinition Height="86"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <StackPanel Grid.Row="1">
+                                <TextBlock Text="Connection Status" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="16" FontWeight="DemiBold" Foreground="White"/>
+                                <TextBlock Name="PeaksConnectionStatus" Text="Connected" Background="red" Margin="4" Width="150" HorizontalAlignment="Stretch" TextAlignment="Center" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="3">
+                                <TextBlock Text="Calibration Status" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="16" FontWeight="DemiBold" Foreground="White"/>
+                                <TextBlock Name="PeaksCalibrationStatus" Text="Calibrated" Background="red" Margin="4" Width="150" HorizontalAlignment="Stretch" TextAlignment="Center" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <Grid Grid.Row="5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="105"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="20"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Column="0" Grid.Row="0" Text="Low Frequency :" VerticalAlignment="Center" Foreground="White" FontSize="14"/>
+                                <TextBox Name="LowFreqPeakBox" Grid.Column="1" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="4,4,0,4" KeyUp="LowFreqPeakBox_KeyUp" LostFocus="LowFreqPeakBox_LostFocus"/>
+                                <TextBox Grid.Column="2" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Center" Text="Hz"/>
+                                <TextBlock Grid.Column="0" Grid.Row="1" Text="High Frequency :" VerticalAlignment="Center" Foreground="White" FontSize="14"/>
+                                <TextBox Name="HighFreqPeakBox" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="4,4,0,4" KeyUp="HighFreqPeakBox_KeyUp" LostFocus="HighFreqPeakBox_LostFocus"/>
+                                <TextBox Grid.Column="2" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Text="Hz"/>
+                                <TextBlock Grid.Column="0" Grid.Row="2" Text="Number Points :" VerticalAlignment="Center" Foreground="White" FontSize="14"/>
+                                <TextBox Name="NumPtsPeakBox" Grid.Column="1" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="4,4,0,4" KeyUp="NumPtsPeakBox_KeyUp" LostFocus="NumPtsPeakBox_LostFocus"/>
+                                <TextBox Grid.Column="2" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Text="Pts"/>
+                                <TextBlock Grid.Column="0" Grid.Row="3" Text="Bandwidth :" VerticalAlignment="Center" Foreground="White" FontSize="14"/>
+                                <TextBox Name="BWPeakBox" Grid.Column="1" Grid.Row="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="4,4,0,4" KeyUp="BWPeakBox_KeyUp" LostFocus="BWPeakBox_LostFocus"/>
+                                <TextBox Grid.Column="2" Grid.Row="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Text="Hz" IsEnabled="False"/>
+                            </Grid>
+                            <StackPanel Grid.Row="6">
+                                <Button Name="PeakTrackRun" Margin="10,10" Content="Run" Click="PeakRun_Click" Height="50"/>
+                                <ProgressBar Name="PeakProgress" Margin="10,0" Height="10" Visibility="Collapsed"/>
+                            </StackPanel>
+                        </Grid>
+                        <!--<TextBlock Height="100" TextWrapping="Wrap" Text="{Binding Path=AvgQF, Converter={StaticResource DoubleConverter}}" Width="100" Margin="10,354,90,221"/>-->
+                    </Grid>
+                </TabItem>
+            </TabControl>
+        </Grid>
+    </Border>
+</Window>
